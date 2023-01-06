@@ -20,7 +20,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ealvar3z/brute/lib"
+	"github.com/ealvar3z/brute/pkg"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 )
@@ -35,13 +35,13 @@ func main() {
 	flag.StringVar(&_pcap, "p", "", "file path of pcap file")
 	verboseFlag := flag.Bool("v", false, "verbose mode")
 	flag.Parse()
-	lib.VerboseMode = *verboseFlag
+	pkg.VerboseMode = *verboseFlag
 
 	if len(strings.TrimSpace(ssidStr)) == 0 {
 		fmt.Println("Provide an SSID: -s <SSID>")
 		os.Exit(1)
 	}
-	lib.SSID = []byte(ssidStr)
+	pkg.SSID = []byte(ssidStr)
 
 	// packet capture
 	pcapFile := _pcap
@@ -70,40 +70,40 @@ func main() {
 	if err != nil {
 		panic("Failed getting the first packet!")
 	}
-	lib.FirstMsgHandler(packet)
+	pkg.FirstMsgHandler(packet)
 
 	// second packet
 	packet, err = packetSrc.NextPacket()
 	if err != nil {
 		panic("Failed getting the second packet!")
 	}
-	lib.SecondMsgHandler(packet)
+	pkg.SecondMsgHandler(packet)
 
 	// third packet
 	packet, err = packetSrc.NextPacket()
 	if err != nil {
 		panic("Failed getting the third packet!")
 	}
-	lib.ThirdMsgHandler(packet)
+	pkg.ThirdMsgHandler(packet)
 
 	// fourth packet
 	packet, err = packetSrc.NextPacket()
 	if err != nil {
 		panic("Failed getting the fourth packet!")
 	}
-	lib.FourthMsgHandler(packet)
+	pkg.FourthMsgHandler(packet)
 
 	for s.Scan() {
 		pw := s.Text()
-		pmk := lib.GeneratePMK(pw)
-		b := lib.GenerateB([]byte(lib.APMac), []byte(lib.ClientMac), lib.ANonce, lib.SNonce)
-		ptk := lib.PRFX(pmk, []byte("Pairwise key expansion"), b, 512)
+		pmk := pkg.GeneratePMK(pw)
+		b := pkg.GenerateB([]byte(pkg.APMac), []byte(pkg.ClientMac), pkg.ANonce, pkg.SNonce)
+		ptk := pkg.PRFX(pmk, []byte("Pairwise key expansion"), b, 512)
 
-		if lib.VerboseMode {
-			fmt.Printf("ANonce: %x \n", lib.ANonce)
-			fmt.Printf("SNonce: %x \n", lib.SNonce)
-			fmt.Printf("AP MAC Addr: %x\n", []byte(lib.APMac))
-			fmt.Printf("Client MAC Addr: %x\n", []byte(lib.ClientMac))
+		if pkg.VerboseMode {
+			fmt.Printf("ANonce: %x \n", pkg.ANonce)
+			fmt.Printf("SNonce: %x \n", pkg.SNonce)
+			fmt.Printf("AP MAC Addr: %x\n", []byte(pkg.APMac))
+			fmt.Printf("Client MAC Addr: %x\n", []byte(pkg.ClientMac))
 			fmt.Println()
 			fmt.Println("Password", pw)
 			fmt.Printf("PMK: %x\n", pmk)
@@ -111,10 +111,10 @@ func main() {
 		}
 		hmacHandler := sha1.New                // WPA2
 		mac := hmac.New(hmacHandler, ptk[:16]) // KCK = first 16 bytes
-		mac.Write(lib.FirstMIC)
+		mac.Write(pkg.FirstMIC)
 		mic := mac.Sum(nil)
 
-		if bytes.Compare(mic[:16], lib.FirstMIC) == 0 {
+		if bytes.Compare(mic[:16], pkg.FirstMIC) == 0 {
 			fmt.Println("Correct Password:", pw)
 			break
 		}

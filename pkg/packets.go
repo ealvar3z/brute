@@ -1,6 +1,6 @@
 // the entire implementation of this library was derived from this article and from reading the gopacket library
 // [link] https://www.wifi-professionals.com/2019/01/4-way-handshake
-package lib
+package pkg
 
 import (
 	"bytes"
