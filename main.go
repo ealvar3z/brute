@@ -75,21 +75,21 @@ func main() {
 	// second packet
 	packet, err = packetSrc.NextPacket()
 	if err != nil {
-		panic("Failed getting the first packet!")
+		panic("Failed getting the second packet!")
 	}
 	lib.SecondMsgHandler(packet)
 
 	// third packet
 	packet, err = packetSrc.NextPacket()
 	if err != nil {
-		panic("Failed getting the first packet!")
+		panic("Failed getting the third packet!")
 	}
 	lib.ThirdMsgHandler(packet)
 
 	// fourth packet
 	packet, err = packetSrc.NextPacket()
 	if err != nil {
-		panic("Failed getting the first packet!")
+		panic("Failed getting the fourth packet!")
 	}
 	lib.FourthMsgHandler(packet)
 
